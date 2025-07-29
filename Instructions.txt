@@ -1,0 +1,8 @@
+kubectl create namespace monitoring
+
+# Load image to cluster (if using kind/minikube)
+kind load docker-image llm-webhook:latest
+
+kubectl apply -f k8s/secret.yaml
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
