@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-webhook
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: llm-webhook
+  template:
+    metadata:
+      labels:
+        app: llm-webhook
+    spec:
+      containers:
+      - name: webhook
+        image: llm-webhook:latest
+        imagePullPolicy: Never  # Use local image on cluster
+        ports:
+        - containerPort: 8000
+        env:
+        - name: OLLAMA_URL
+          value: http://ollama.monitoring.svc.cluster.local:11434/api/generate
+        - name: GRAFANA_URL
+          value: http://grafana.monitoring.svc.cluster.local:3000
+        - name: GRAFANA_DASHBOARD_ID
+          value: "1"
+        - name: GRAFANA_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: llm-webhook-secret
+              key: grafana_api_key
+        - name: TEAMS_WEBHOOK_URL
+          valueFrom:
+            secretKeyRef:
+              name: llm-webhook-secret
+              key: teams_webhook
